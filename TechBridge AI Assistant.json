@@ -8,18 +8,18 @@
         ],
         "additionalFields": {}
       },
-      "id": "2bc55da4-1480-46d7-bc48-a51d12ab9217",
+      "id": "84efc931-0d87-4f51-9ead-23672f99bc00",
       "name": "Telegram Trigger",
       "type": "n8n-nodes-base.telegramTrigger",
       "typeVersion": 1.5,
       "position": [
-        0,
-        112
+        352,
+        -128
       ],
       "webhookId": "3d533f8b-fa71-422b-84a5-72ed9a37bd2c",
       "credentials": {
         "telegramApi": {
-          "id": "3N9VQd2mLxQ0ahQf",
+          "id": "JLd3mdQQqXOE4fRY",
           "name": "Telegram account"
         }
       }
@@ -29,16 +29,16 @@
         "promptType": "define",
         "text": "={{ $json.message.text }}",
         "options": {
-          "systemMessage": "You are the TechBridge Club Telegram assistant for Hawhaw, a Club Officer. You can chat normally and answer questions, and you have four tools: \"Book Calendar Event\" (create a Google Calendar booking), \"Read Calendar Events\" (look up upcoming events), and \"Read Gmail Messages\" (search recent Gmail). Only use a tool when the user asks for something that requires it (booking, checking the calendar, or checking email). When booking events, always confirm the date, time, and title back to the user in your reply. Keep replies concise and use plain text suitable for a Telegram chat message (no heavy markdown)."
+          "systemMessage": "You are the TechBridge Club Telegram assistant for [name], a Club Officer. You can chat normally and answer questions, and you have four tools: \"Book Calendar Event\" (create a Google Calendar booking), \"Read Calendar Events\" (look up upcoming events), and \"Read Gmail Messages\" (search recent Gmail). Only use a tool when the user asks for something that requires it (booking, checking the calendar, or checking email). When booking events, always confirm the date, time, and title back to the user in your reply. Keep replies concise and use plain text suitable for a Telegram chat message (no heavy markdown)."
         }
       },
-      "id": "f6cea122-edbc-47ff-8355-fe9186c5439d",
+      "id": "dbe52469-868c-43e2-a2dc-4cd356a67085",
       "name": "TechBridge Assistant Agent",
       "type": "@n8n/n8n-nodes-langchain.agent",
       "typeVersion": 3.1,
       "position": [
-        416,
-        112
+        768,
+        -128
       ]
     },
     {
@@ -47,13 +47,13 @@
         "sessionKey": "={{ $('Telegram Trigger').item.json.message.chat.id }}",
         "contextWindowLength": 10
       },
-      "id": "6a956dc6-0af3-4ab4-8c91-ce40805603dd",
+      "id": "42095439-88dc-4c56-8b82-68b6f1546ea4",
       "name": "Conversation Memory",
       "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
       "typeVersion": 1.4,
       "position": [
-        352,
-        336
+        704,
+        96
       ]
     },
     {
@@ -72,17 +72,17 @@
           "summary": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('title', 'Title of the event/booking') }}"
         }
       },
-      "id": "42550a61-3f34-4e18-b917-db53df068cb8",
+      "id": "d223f00f-9ba6-483e-8588-f83d37546135",
       "name": "Book Calendar Event",
       "type": "n8n-nodes-base.googleCalendarTool",
       "typeVersion": 1.3,
       "position": [
-        480,
-        336
+        832,
+        96
       ],
       "credentials": {
         "googleCalendarOAuth2Api": {
-          "id": "byjI6SMg6yFMMHcR",
+          "id": "WGMm4mcZLFtENVRH",
           "name": "Google Calendar account"
         }
       }
@@ -101,17 +101,17 @@
         "timeMax": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('time_max', 'End of the date/time range to search, ISO 8601 format') }}",
         "options": {}
       },
-      "id": "4d0a8d28-f225-42a3-b65b-a7830296b6e2",
+      "id": "4c527f91-19f7-4f57-9317-daf7db0ea21b",
       "name": "Read Calendar Events",
       "type": "n8n-nodes-base.googleCalendarTool",
       "typeVersion": 1.3,
       "position": [
-        608,
-        336
+        960,
+        96
       ],
       "credentials": {
         "googleCalendarOAuth2Api": {
-          "id": "byjI6SMg6yFMMHcR",
+          "id": "WGMm4mcZLFtENVRH",
           "name": "Google Calendar account"
         }
       }
@@ -125,19 +125,19 @@
           "readStatus": "both"
         }
       },
-      "id": "970f1582-3ead-431c-8825-30b5cc969354",
+      "id": "18e121fe-dc96-4a18-8275-a179a2c08290",
       "name": "Read Gmail Messages",
       "type": "n8n-nodes-base.gmailTool",
       "typeVersion": 2.2,
       "position": [
-        736,
-        336
+        1088,
+        96
       ],
       "webhookId": "aa1fe03a-6114-4043-aefd-d6ed77314f77",
       "credentials": {
         "gmailOAuth2": {
-          "id": "Q9XlK094fJ6c07sp",
-          "name": "Gmail account"
+          "id": "VByEie7Ff7zEy5az",
+          "name": "Gmail account 2"
         }
       }
     },
@@ -149,39 +149,39 @@
           "appendAttribution": false
         }
       },
-      "id": "11d01f27-6692-4a02-bd72-1044986a77e1",
+      "id": "b5c9f64d-fb73-49c3-81f2-8e5b7069bbb6",
       "name": "Send Telegram Reply",
       "type": "n8n-nodes-base.telegram",
       "typeVersion": 1.2,
       "position": [
-        944,
-        112
+        1296,
+        -128
       ],
       "webhookId": "6a564bb2-a586-4106-b3e2-2829cb175171",
       "credentials": {
         "telegramApi": {
-          "id": "3N9VQd2mLxQ0ahQf",
+          "id": "JLd3mdQQqXOE4fRY",
           "name": "Telegram account"
         }
       }
     },
     {
       "parameters": {
-        "model": "openrouter/free",
+        "modelName": "models/gemini-3.1-flash-lite",
         "options": {}
       },
-      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
-      "typeVersion": 1,
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1.1,
       "position": [
-        80,
-        320
+        528,
+        64
       ],
-      "id": "440a7032-ad85-48c3-b744-e588154fbe37",
-      "name": "OpenRouter Chat Model (Free)",
+      "id": "5df03d95-e441-4183-b298-f29ac5d69711",
+      "name": "Google Gemini Chat Model",
       "credentials": {
-        "openRouterApi": {
-          "id": "ABz2CMukN6sSgWTE",
-          "name": "OpenRouter account"
+        "googlePalmApi": {
+          "id": "VkHyCPi8GyDy533y",
+          "name": "Google Gemini(PaLM) Api account"
         }
       }
     }
@@ -254,7 +254,7 @@
         ]
       ]
     },
-    "OpenRouter Chat Model (Free)": {
+    "Google Gemini Chat Model": {
       "ai_languageModel": [
         [
           {
@@ -266,20 +266,17 @@
       ]
     }
   },
-  "active": true,
+  "active": false,
   "settings": {
     "executionOrder": "v1",
-    "binaryMode": "separate",
-    "availableInMCP": true
+    "binaryMode": "separate"
   },
-  "versionId": "76e8f400-ae75-4635-bfa1-2f8714a41bd2",
+  "versionId": "107374cf-0f51-4831-8437-e5b19611b2fa",
   "meta": {
-    "aiBuilderAssisted": true,
-    "builderVariant": "mcp",
     "templateCredsSetupCompleted": true,
-    "instanceId": "dfa13c5277730aef8378d9c66eba0707234afda3d6e5a58e663f6bfd9700d0a2"
+    "instanceId": "7756a9f8a3ce80e5712aff4e813a159626c186c8d1f1285c5d60bd3348976293"
   },
   "nodeGroups": [],
-  "id": "iHthZUeL19SKp3pL",
+  "id": "ngALJ5L9jzFmYxHR",
   "tags": []
 }
