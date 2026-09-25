@@ -17,7 +17,7 @@ This workflow utilizes n8n's Advanced AI Agent architecture:
 | Node Type | Function | Configuration Details |
 | :--- | :--- | :--- |
 | **Telegram Trigger** | Ingestion | Listens for incoming `message` updates via webhook. |
-| **OpenRouter Chat Model** | LLM Engine | Uses the `openrouter/free` model for natural language processing and tool-calling capabilities. |
+| **Google AI chat model** | LLM Engine | Uses the `gemini-3.0-flash` model for natural language processing and tool-calling capabilities. |
 | **AI Agent** | Routing | LangChain-based agent configured with a specific system prompt for club officer management. |
 | **Window Buffer Memory** | Context | Stores session context using `{{ $('Telegram Trigger').item.json.message.chat.id }}`. |
 | **Google Calendar Tools** | Execution | Two independent tool nodes handling `Create` (booking) and `getAll` (reading) operations. |
@@ -28,18 +28,105 @@ This workflow utilizes n8n's Advanced AI Agent architecture:
 
 *   An active [n8n](https://n8n.io/) instance (self-hosted or cloud).
 *   A Telegram Bot Token (generated via [@BotFather](https://t.me/botfather)).
-*   An OpenRouter API key.
+*   An google AI Studio key.
 *   A Google Cloud Project with the **Google Calendar API** and **Gmail API** enabled, along with a configured OAuth2 Client ID and Secret.
 
-## Installation & Setup
+## Step-by-Step guide
 
-1.  **Import the Workflow:**
-    *   Download the `workflow.json` file from this repository.
-    *   In your n8n dashboard, click **Add Workflow** > **Import from File** and select the JSON file.
-2.  **Configure Credentials:**
-    *   **Telegram API:** Enter your Bot Token in the Telegram Trigger and Output nodes.
-    *   **OpenRouter API:** Enter your OpenRouter API key in the Chat Model node.
-    *   **Google Workspace (OAuth2):** Connect your Google Calendar and Gmail nodes by authenticating with your Google Cloud credentials. Click "Sign in with Google" inside the node settings to authorize the connection.
-3.  **Activate:**
-    *   Toggle the workflow to **Active** in the top right corner of the n8n canvas.
-    *   Send a message to your Telegram bot (e.g., "What's on the calendar this week?" or "Book a meeting for tomorrow at 2 PM") to test the tool-calling integration.
+## Step 1 — Create your Telegram bot
+Open Telegram, search for @BotFather , and start a chat with it.
+Send the command /newbot .
+Choose a display name (e.g. TechBridge Assistant ), then a username ending in bot (e.g.
+techbridge_assist_bot ).
+BotFather replies with an API token that looks like
+123456789:AAExxxxxxxxxxxxxxxxxxxxxxxxxxxxx . Save it somewhere — you'll paste it into
+n8n in Step 5.
+Open a chat with your new bot and send it any message (e.g. "hi"). This registers a chat so
+the bot has somewhere to reply once it's live.
+
+## Step 2 — Get your Google AI Studio API key
+Open your web browser, navigate to aistudio.google.com, and sign in with your Google account.
+Click on Get API key in the left-hand navigation menu.
+Click the Create API key button and choose to generate it within a new or existing Google Cloud project.
+The platform will generate an API token that looks like AIzaxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx . Save it somewhere — you'll paste it into n8n alongside your Telegram token.
+Keep the key secure and do not share it publicly, as it acts as the billing and access credential for your bot's Gemini model.
+
+## Step 3 — Enable Google Calendar & Gmail APIs
+Go to the Google Cloud Console.
+Create a new project (or select an existing one) — top-left project dropdown → New
+Project.
+Go to APIs & Services → Library and enable:
+Google CalendarAPI
+Gmail API
+Go to APIs & Services → OAuth consent screen, choose External, fill in the required app
+name/email fields, and add your own Google account as a test user.
+Go to APIs & Services → Credentials → Create Credentials → OAuth client ID.
+Application type: Web application
+Name it anything (e.g. n8n TechBridge Bot )
+Leave redirect URIs blank for now — you'll add the real one in Step 5 once n8n gives
+it to you
+Copy the Client ID and Client Secret shown after creation.
+
+## Step 4 - Setup n8n workflow
+n8n Cloud Sign up at n8n.io and open your hosted instance (free trial available;
+paid after trial).
++ new credential - create credential
+What to enter
+
+1 Telegram API - Paste the bot token from Step 1
+2 Google AI studio API - Paste the API key from Step 2
+3 Google Calendar OAuth2 API
+
+Paste the Client ID + Secret from Step 3. n8n will show you a redirect URI —
+copy it back into your Google Cloud OAuth client's "Authorized redirect URIs"
+(Step 3.5), save, then click Connect my account in n8n and approve access
+
+4 Gmail OAuth2 API
+
+Same Client ID + Secret as #3 — repeat the redirect URI step, then Connect my
+account and approve
+
+## Step 6 — Import the workflow
+Download TechBridge AI Assistant.json from this repository (exported from n8n).
+In n8n: Workflows → Add Workflow → ⋮ menu → Import from File → select
+TechBridge AI Assistant.json .
+Open each node below and confirm the credential dropdown points at what you created
+in Step 5 (n8n usually auto-matches by name — just verify the green connected
+indicator):
+Node Credential
+Telegram Trigger - Telegram API
+Send Telegram Reply - Telegram API
+Google AI chat model - Google AI studioAPI
+Book Calendar Event - Google Calendar OAuth2 API
+Read Calendar Events - Google Calendar OAuth2 API
+Read Gmail Messages Gmail - OAuth2 API
+
+## Step 7 — Activate and test
+Toggle the workflow to Active in the top-right corner of the n8n canvas.
+Message your bot on Telegram:
+
+"Hi, what can you help me with?" → expect a plain-text reply
+
+"What's on my calendar tomorrow?" → expect a list of events (or "nothing
+scheduled")
+"Book a test event called Demo tomorrow 10am to 11am" → expect a confirmation,
+then check Google Calendar to verify it was created
+If a tool call fails, open the Executions tab in n8n and inspect the failed node — it's
+almost always an unconnected credential or an unapproved OAuth scope.
+
+## Customizing
+Personality / rules — edit the systemMessage field on the AI Agent node to change tone
+or add club-specific context (e.g. this semester's event list).
+Memory depth — the Conversation Memory node keeps the last 10 messages per chat;
+change contextWindowLength to adjust.
+More tools — add more n8n tool nodes (Google Sheets, Notion, HTTP Request, etc.) to
+the Agent's tool list to extend capabilities without changing the core structure.
+— no other node needs to change.
+
+## Known limitations
+Free-tier models on Google AI Studio are rate-limited (not literally unlimited) — fine for a
+small club's usage, but heavy concurrent use may hit limits.
+The bot replies only in the chat that messaged it; using it in a group chat with multiple
+officers would need a small addition (checking sender ID / permissions).
+Google OAuth tokens can expire or need re-consent — if Calendar/Gmail tools stop
+responding, reconnect the credential in n8n.
